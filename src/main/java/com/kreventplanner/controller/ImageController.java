@@ -1,0 +1,52 @@
+package com.kreventplanner.controller;
+
+import com.kreventplanner.dto.ImageUploadResponse;
+import com.kreventplanner.dto.ImagesLinkResponse;
+import com.kreventplanner.service.ImageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+@RestController
+@RequestMapping("/api/images")
+@RequiredArgsConstructor
+public class ImageController {
+
+    private final ImageService imageService;
+
+    @PostMapping("/upload")
+    public ResponseEntity<ImageUploadResponse> uploadImage(
+            @RequestParam("image") MultipartFile image,
+            @RequestParam("eventType") String eventType) throws IOException {
+
+        ImageUploadResponse response = imageService.uploadImage(image, eventType);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getImages/{eventType}")
+    public ResponseEntity<ImagesLinkResponse> getImagesByEventType(@PathVariable String eventType) {
+        ImagesLinkResponse response = imageService.getImagesByEventType(eventType);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteImage(@PathVariable Long id) {
+        try {
+            imageService.deleteImage(id);
+            return ResponseEntity.ok("Image deleted successfully");
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Error deleting image from Cloudinary");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+}
