@@ -7,5 +7,7 @@ import java.util.List;
 public interface EventInquiryService {
     String saveInquiry(EventInquiry inquiry);
     List<EventInquiry> getAllInquiries();
+    List<EventInquiry> getFilteredInquiries(String eventType, InquiryStatus status);
     EventInquiry updateInquiryStatus(Long id, InquiryStatus status);
 }
+

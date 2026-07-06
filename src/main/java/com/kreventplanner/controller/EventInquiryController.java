@@ -1,6 +1,7 @@
 package com.kreventplanner.controller;
 
 import com.kreventplanner.entity.EventInquiry;
+import com.kreventplanner.entity.InquiryStatus;
 import com.kreventplanner.service.EventInquiryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +37,19 @@ public class EventInquiryController {
         return ResponseEntity.ok(eventInquiryService.getAllInquiries());
     }
 
+    /**
+     * GET /api/inquiries/filter?eventType=Wedding&status=NEW
+     * Both query params are optional. When omitted, all inquiries are returned.
+     */
+    @GetMapping("/filter")
+    public ResponseEntity<List<EventInquiry>> getFilteredInquiries(
+            @RequestParam(required = false) String eventType,
+            @RequestParam(required = false) InquiryStatus status) {
+        return ResponseEntity.ok(eventInquiryService.getFilteredInquiries(eventType, status));
+    }
+
     @PutMapping("/{id}/status")
-    public ResponseEntity<EventInquiry> updateInquiryStatus(@PathVariable Long id, @RequestParam com.kreventplanner.entity.InquiryStatus status) {
+    public ResponseEntity<EventInquiry> updateInquiryStatus(@PathVariable Long id, @RequestParam InquiryStatus status) {
         EventInquiry updatedInquiry = eventInquiryService.updateInquiryStatus(id, status);
         return ResponseEntity.ok(updatedInquiry);
     }

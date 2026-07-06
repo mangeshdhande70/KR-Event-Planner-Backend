@@ -1,15 +1,16 @@
 package com.kreventplanner.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class LoginResponse {
     private boolean success;
     private String message;
     private String username;
     private String role;
+    private String token;
 }

@@ -26,7 +26,9 @@ public class ImageServiceImpl implements ImageService {
     private final EventImageRepository eventImageRepository;
 
     private static final List<String> ALLOWED_EVENT_TYPES = Arrays.asList("Birthday", "Wedding", "Corporate",
-            "Engagement", "Baby Shower", "Ring Ceremony", "Theme Party");
+            "Engagement", "Baby Shower", "Ring Ceremony", "Theme Party", "Reception", "Naming Ceremony",
+            "Product Launching", "House Warming", "Festival Event", "Welcome Home", "Anniversary", 
+            "Retirement Party", "Annaprshan");
     private static final List<String> ALLOWED_CONTENT_TYPES = Arrays.asList("image/jpeg", "image/png", "image/jpg",
             "image/webp");
 
@@ -34,7 +36,7 @@ public class ImageServiceImpl implements ImageService {
     public ImageUploadResponse uploadImage(MultipartFile image, String eventType) throws IOException {
         if (!ALLOWED_EVENT_TYPES.contains(eventType)) {
             throw new IllegalArgumentException(
-                    "Invalid eventType. Allowed values: Birthday, Wedding, Corporate, Engagement, Baby Shower, Ring Ceremony, Theme Party");
+                    "Invalid eventType. Allowed values: Birthday, Wedding, Corporate, Engagement, Baby Shower, Ring Ceremony, Theme Party, Reception, Naming Ceremony, Product Launching, House Warming, Festival Event, Welcome Home, Anniversary, Retirement Party, Annaprshan");
         }
 
         if (image.isEmpty()) {
