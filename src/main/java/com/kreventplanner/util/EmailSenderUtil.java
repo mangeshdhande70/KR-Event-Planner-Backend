@@ -1,5 +1,6 @@
 package com.kreventplanner.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.kreventplanner.entity.EventInquiry;
 
 @Service
+@Slf4j
 public class EmailSenderUtil {
 
     private final JavaMailSender mailSender;
@@ -24,6 +26,7 @@ public class EmailSenderUtil {
 
     @Async
     public void sendInquiryAcknowledgment(EventInquiry inquiry) {
+        log.info("Email request has been come to send an email to {} ",inquiry.getEmail());
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
@@ -49,7 +52,7 @@ public class EmailSenderUtil {
 
             message.setText(body);
             mailSender.send(message);
-            System.out.println("Email successfully sent to: " + inquiry.getEmail());
+            log.info("Email successfully sent to {} ", inquiry.getEmail());
         } catch (Exception e) {
             System.err.println("Failed to send email to " + inquiry.getEmail() + ": " + e.getMessage());
             e.printStackTrace();

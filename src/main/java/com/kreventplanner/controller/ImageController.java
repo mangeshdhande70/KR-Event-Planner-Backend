@@ -20,9 +20,10 @@ public class ImageController {
     @PostMapping("/upload")
     public ResponseEntity<ImageUploadResponse> uploadImage(
             @RequestParam("image") MultipartFile image,
-            @RequestParam("eventType") String eventType) throws IOException {
+            @RequestParam("eventType") String eventType,
+            @RequestParam(value = "isDefault", required = false, defaultValue = "false") boolean isDefault) throws IOException {
 
-        ImageUploadResponse response = imageService.uploadImage(image, eventType);
+        ImageUploadResponse response = imageService.uploadImage(image, eventType, isDefault);
         return ResponseEntity.ok(response);
     }
 
@@ -42,5 +43,11 @@ public class ImageController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @PutMapping("/{id}/default")
+    public ResponseEntity<Void> setDefaultImage(@PathVariable Long id) {
+        imageService.setDefaultImage(id);
+        return ResponseEntity.ok().build();
     }
 }

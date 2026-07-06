@@ -33,4 +33,8 @@ public class EventImage {
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime uploadedAt;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean isDefault = false;
 }

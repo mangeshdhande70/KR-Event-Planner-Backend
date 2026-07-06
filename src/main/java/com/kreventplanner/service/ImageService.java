@@ -7,7 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface ImageService {
-    ImageUploadResponse uploadImage(MultipartFile image, String eventType) throws IOException;
+    ImageUploadResponse uploadImage(MultipartFile image, String eventType, boolean isDefault) throws IOException;
     ImagesLinkResponse getImagesByEventType(String eventType);
     void deleteImage(Long id) throws IOException;
+    void setDefaultImage(Long id);
 }

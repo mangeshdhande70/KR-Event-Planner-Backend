@@ -33,7 +33,8 @@ public class ImageServiceImpl implements ImageService {
             "image/webp");
 
     @Override
-    public ImageUploadResponse uploadImage(MultipartFile image, String eventType) throws IOException {
+    @org.springframework.transaction.annotation.Transactional
+    public ImageUploadResponse uploadImage(MultipartFile image, String eventType, boolean isDefault) throws IOException {
         if (!ALLOWED_EVENT_TYPES.contains(eventType)) {
             throw new IllegalArgumentException(
                     "Invalid eventType. Allowed values: Birthday, Wedding, Corporate, Engagement, Baby Shower, Ring Ceremony, Theme Party, Reception, Naming Ceremony, Product Launching, House Warming, Festival Event, Welcome Home, Anniversary, Retirement Party, Annaprshan");
@@ -62,8 +63,13 @@ public class ImageServiceImpl implements ImageService {
                 .eventType(eventType)
                 .imageUrl(imageUrl)
                 .publicId(publicId)
+                .isDefault(isDefault)
                 .build();
         eventImageRepository.save(eventImage);
+
+        if (isDefault) {
+            eventImageRepository.unsetDefaultForOtherImages(eventType, eventImage.getId());
+        }
 
         return ImageUploadResponse.builder()
                 .success(true)
@@ -82,7 +88,8 @@ public class ImageServiceImpl implements ImageService {
         List<ImageDto> imageDtos = eventImages.stream()
                 .map(img -> ImageDto.builder()
                         .id(img.getId())
-                        .imageUrl(img.getImageUrl())
+                        .imageUrl(applyCloudinaryOptimizations(img.getImageUrl()))
+                        .isDefault(img.isDefault())
                         .build())
                 .collect(Collectors.toList());
 
@@ -98,5 +105,24 @@ public class ImageServiceImpl implements ImageService {
 
         cloudinary.uploader().destroy(eventImage.getPublicId(), ObjectUtils.emptyMap());
         eventImageRepository.delete(eventImage);
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void setDefaultImage(Long id) {
+        EventImage eventImage = eventImageRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Image not found with id: " + id));
+
+        eventImage.setDefault(true);
+        eventImageRepository.save(eventImage);
+
+        eventImageRepository.unsetDefaultForOtherImages(eventImage.getEventType(), id);
+    }
+
+    private String applyCloudinaryOptimizations(String url) {
+        if (url != null && url.contains("/upload/")) {
+            return url.replace("/upload/", "/upload/f_auto,q_auto/");
+        }
+        return url;
     }
 }

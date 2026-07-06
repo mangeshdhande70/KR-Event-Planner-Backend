@@ -12,10 +12,10 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.core.annotation.Order;
 
 @Configuration
 @EnableWebSecurity
@@ -47,20 +47,17 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/inquiries").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/images/getImages/**").permitAll()
-                        // MCP Server endpoints (SSE transport)
-                        .requestMatchers("/sse", "/mcp/**").permitAll()
-                        // ChatGPT probes this path for OAuth — must return 404, not 403
-                        .requestMatchers("/.well-known/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()
 
                         // Any other request requires authentication
                         .anyRequest().authenticated())
